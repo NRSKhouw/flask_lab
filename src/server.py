@@ -169,7 +169,7 @@ def delete_person(var_name):
     return {"message": "Person not found"}, 404
   
 @app.route("/person", methods=['POST'])
-def create_person():
+def add_by_uuid():
     # Get the JSON data from the incoming request
     new_person = request.get_json()
 
@@ -177,10 +177,19 @@ def create_person():
     if not new_person:
         # Return a JSON response indicating that the request data is invalid or missing
         # with a status code of 400 (Bad Request)
-        return {"message": "Invalid input, no data provided"}, 400
+        return {"message": "Invalid input, no data provided"}, 422
 
     # Proceed with further processing of 'new_person', such as adding it to a database
     # or validating its contents before saving it
-
+    try:
+        data.append(new_person)
+    except NameError:
+        return {"message": "data not defined"}, 500
     # Assuming the processing is successful, return a success message with status code 201 (Created)
-    return {"message": "Person created successfully"}, 201
+    return {"message": new_person['id']}, 200
+  
+@app.errorhandler(404)
+def api_not_found(error):
+    # This function is a custom error handler for 404 Not Found errors
+    # It is triggered whenever a 404 error occurs within the Flask application
+    return {"message": "API not found"}, 404
