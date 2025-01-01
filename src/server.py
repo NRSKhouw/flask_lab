@@ -133,3 +133,54 @@ def name_search():
 
     # If no match is found, return a JSON response with a message indicating the person was not found and a 404 Not Found status code
     return {"message": "Person not found"}, 404
+  
+@app.route("/count")
+def count():
+    try:
+        # Attempt to return a JSON response with the count of items in 'data'
+        # Replace {insert code to find length of data} with len(data) to get the length of the 'data' collection
+        return {"data count": len(data)}, 200
+    except NameError:
+        # If 'data' is not defined and raises a NameError
+        # Return a JSON response with a message and a 500 Internal Server Error status code
+        return {"message": "data not defined"}, 500
+
+@app.route("/person/<uuid:var_name>")
+def find_by_uuid(var_name):
+    # Iterate through the 'data' list to search for a person with a matching ID
+    for person in data:
+        # Check if the 'id' field of the person matches the 'var_name' parameter
+        if person["id"] == str(var_name):
+            # Return the person as a JSON response if a match is found
+            return person
+
+    # Return a JSON response with a message and a 404 Not Found status code if no matching person is found
+    return {"message": "Person not found"}, 404
+  
+@app.route("/person/<uuid:var_name>", methods=['DELETE'])
+def delete_person(var_name):
+    for person in data:
+        if person["id"] == str(var_name):
+            # Remove the person from the data list
+            data.remove(person)
+            # Return a JSON response with a message and HTTP status code 200 (OK)
+            return {"message": "Person with ID deleted"}, 200
+    # If no person with the given ID is found, return a JSON response with a message and HTTP status code 404 (Not Found)
+    return {"message": "Person not found"}, 404
+  
+@app.route("/person", methods=['POST'])
+def create_person():
+    # Get the JSON data from the incoming request
+    new_person = request.get_json()
+
+    # Check if the JSON data is empty or None
+    if not new_person:
+        # Return a JSON response indicating that the request data is invalid or missing
+        # with a status code of 400 (Bad Request)
+        return {"message": "Invalid input, no data provided"}, 400
+
+    # Proceed with further processing of 'new_person', such as adding it to a database
+    # or validating its contents before saving it
+
+    # Assuming the processing is successful, return a success message with status code 201 (Created)
+    return {"message": "Person created successfully"}, 201
